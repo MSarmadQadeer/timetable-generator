@@ -22,8 +22,6 @@ public class Main {
         String[] totalClasses = {"1A", "1B", "1C", "2A", "2B", "2C"};
         String[] semester1Classes = {"1A", "1B", "1C"};
         String[] semester2Classes = {"2A", "2B", "2C"};
-        ArrayList<String> semester1Teachers = new ArrayList<>();
-        ArrayList<String> semester2Teachers = new ArrayList<>();
         String[] semester1 = {"Introduction_To_Computing", "Applied_Physics", "Islamic_Studies", "Calculus", "English"};
         String[] semester2 = {"Programming_Fundamentals", "Multi_Calculus", "Discrete_Structures", "Report_Writing", "Digital_Logic_Design"};
         String[] teachersNames = {"Sir_Asif", "Mam_Nadia", "Mam_Saira", "Mam_Muneeba", "Mam_Ayesha", "Sir_Majid", "Sir_Tahir", "Mam_Shafia", "Sir_Suleiman", "Mam_Misbah"};
@@ -55,11 +53,6 @@ public class Main {
             classCheck.add(totalClass);
         }
 
-        for (int i = 0; i < teachersNames.length; i++) {
-            if (searchArray(teachersCourses[i], semester1)) semester1Teachers.add(teachersNames[i]);
-            else if (searchArray(teachersCourses[i], semester2)) semester2Teachers.add(teachersNames[i]);
-        }
-
         String[][][] teachersTimeTable = new String[teachersNames.length][5][5];
         String[][][] classTimeTable = new String[totalClasses.length][5][5];
         String[][][] roomTimeTable = new String[room.size()][5][5];
@@ -74,8 +67,8 @@ public class Main {
                         if (countNull(teachersTimeTable[teacher][day]) > 3) {
                             // ^ It Checks Teachers Day Lectures (Maximum 2 per Day)
                             String[] classes = null;
-                            if (searchList(teachersNames[teacher], semester1Teachers)) classes = semester1Classes;
-                            else if (searchList(teachersNames[teacher], semester2Teachers)) classes = semester2Classes;
+                            if (searchArray(teachersCourses[teacher], semester1)) classes = semester1Classes;
+                            else if (searchArray(teachersCourses[teacher], semester2)) classes = semester2Classes;
                             // ^ Above conditions selects the specific classes related to teacher
                             for (String C : classes != null ? classes : new String[0]) {
                                 if (classTimeTable[index(C, totalClasses)][day][period] == null) {
