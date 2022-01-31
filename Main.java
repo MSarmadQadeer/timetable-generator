@@ -14,9 +14,9 @@ public class Main {
         System.out.println("__________________________________________________________________________________________________");
         System.out.println();
 
-        ArrayList<String> room = new ArrayList<>();
-        ArrayList<Integer> roomCapacity = new ArrayList<>();
-        ArrayList<Integer> classCapacity = new ArrayList<>();
+        ArrayList<String> rooms = new ArrayList<>();
+        ArrayList<Integer> roomsCapacity = new ArrayList<>();
+        ArrayList<Integer> classesCapacity = new ArrayList<>();
         ArrayList<String> classCheck = new ArrayList<>();
         //  classCheck ArrayList is created for the purpose of tracking which classes are unable to take all their lectures.
         String[] totalClasses = {"1A", "1B", "1C", "2A", "2B", "2C"};
@@ -30,32 +30,32 @@ public class Main {
         int ask = inputInt("How Many Rooms Are Available ? ");
         for (int i = 0; i < ask; i++) {
             String ROOM = input("Enter Room : ");
-            room.add(ROOM);
-            roomCapacity.add(inputInt("Enter " + ROOM + " Capacity: "));
+            rooms.add(ROOM);
+            roomsCapacity.add(inputInt("Enter " + ROOM + " Capacity: "));
         }
 
-        //  Sort roomCapacity and room
-        for (int i = 0; i < room.size(); i++) {
-            for (int j = 0; j < (room.size() - 1); j++) {
-                if (roomCapacity.get(j) > roomCapacity.get(j + 1)) {
-                    int dummy = roomCapacity.get(j);
-                    roomCapacity.set(j, roomCapacity.get(j + 1));
-                    roomCapacity.set(j + 1, dummy);
-                    String Dummy = room.get(j);
-                    room.set(j, room.get(j + 1));
-                    room.set(j + 1, Dummy);
+        //  Sort roomsCapacity and rooms
+        for (int i = 0; i < rooms.size(); i++) {
+            for (int j = 0; j < (rooms.size() - 1); j++) {
+                if (roomsCapacity.get(j) > roomsCapacity.get(j + 1)) {
+                    int dummy = roomsCapacity.get(j);
+                    roomsCapacity.set(j, roomsCapacity.get(j + 1));
+                    roomsCapacity.set(j + 1, dummy);
+                    String Dummy = rooms.get(j);
+                    rooms.set(j, rooms.get(j + 1));
+                    rooms.set(j + 1, Dummy);
                 }
             }
         }
 
-        for (String totalClass : totalClasses) {
-            classCapacity.add(inputInt("Enter Strength Of " + totalClass + " : "));
-            classCheck.add(totalClass);
+        for (String C : totalClasses) {
+            classesCapacity.add(inputInt("Enter Strength Of " + C + " : "));
+            classCheck.add(C);
         }
 
         String[][][] teachersTimeTable = new String[teachersNames.length][5][5];
-        String[][][] classTimeTable = new String[totalClasses.length][5][5];
-        String[][][] roomTimeTable = new String[room.size()][5][5];
+        String[][][] classesTimeTable = new String[totalClasses.length][5][5];
+        String[][][] roomsTimeTable = new String[rooms.size()][5][5];
 
         for (int teacher = 0; teacher < teachersTimeTable.length; teacher++) {
             day:
@@ -71,23 +71,23 @@ public class Main {
                             else if (searchArray(teachersCourses[teacher], semester2)) classes = semester2Classes;
                             // ^ Above conditions selects the specific classes related to teacher
                             for (String C : classes != null ? classes : new String[0]) {
-                                if (classTimeTable[index(C, totalClasses)][day][period] == null) {
+                                if (classesTimeTable[index(C, totalClasses)][day][period] == null) {
                                     // ^ It Checks that the Class at the Particular Time Slot is Free
-                                    if (countNull(classTimeTable[index(C, totalClasses)][day]) > 2) {
+                                    if (countNull(classesTimeTable[index(C, totalClasses)][day]) > 2) {
                                         // ^ It Checks that the Class will take maximum 3 lecture in a Day
                                         if (count1d(C, teachersTimeTable[teacher][day]) == 0) {
                                             // ^ It Checks that the Teacher will take maximum 1 lecture in a Particular Class per Day
                                             if (count2d(C, teachersTimeTable[teacher]) < 2) {
                                                 // ^ It Checks that the Teacher will take maximum 2 lecture in a Particular Class per Week
-                                                for (String R : room) {
-                                                    if (roomTimeTable[room.indexOf(R)][day][period] == null) {
+                                                for (String R : rooms) {
+                                                    if (roomsTimeTable[rooms.indexOf(R)][day][period] == null) {
                                                         // ^ It Checks that the Room at the Particular Time Slot is Empty
-                                                        if (roomCapacity.get(room.indexOf(R)) >= classCapacity.get(index(C, totalClasses))) {
-                                                            roomTimeTable[room.indexOf(R)][day][period] = C;
+                                                        if (roomsCapacity.get(rooms.indexOf(R)) >= classesCapacity.get(index(C, totalClasses))) {
+                                                            roomsTimeTable[rooms.indexOf(R)][day][period] = C;
                                                             teachersTimeTable[teacher][day][period] = C;
-                                                            classTimeTable[index(C, totalClasses)][day][period] = teachersCourses[teacher];
+                                                            classesTimeTable[index(C, totalClasses)][day][period] = teachersCourses[teacher];
 
-                                                            if (countFill2d(classTimeTable[index(C, totalClasses)]) == 10)
+                                                            if (countFill2d(classesTimeTable[index(C, totalClasses)]) == 10)
                                                                 classCheck.remove(C);
                                                             // ^ It Checks the Classes that took all their Lectures
 
@@ -128,10 +128,10 @@ public class Main {
                 for (int k = 0; k < 5; k++) {
                     if (teachersTimeTable[i][j][k] == null) System.out.printf("%-4s|", " ");
                     else {
-                        for (int r = 0; r < room.size(); r++) {
+                        for (int r = 0; r < rooms.size(); r++) {
                             try {
-                                if (roomTimeTable[r][j][k].equals(teachersTimeTable[i][j][k]))
-                                    System.out.printf("%-4s|", room.get(r));
+                                if (roomsTimeTable[r][j][k].equals(teachersTimeTable[i][j][k]))
+                                    System.out.printf("%-4s|", rooms.get(r));
                             } catch (NullPointerException ignored) {
                             }
                         }
@@ -144,7 +144,7 @@ public class Main {
 
         System.out.println("_".repeat(13 + (25 * 5) + 1));
         for (String C : classCheck) {
-            System.out.println((10 - countFill2d(classTimeTable[index(C, totalClasses)])) + " Lectures Of " + C + " are Skipped Due To Unavailability of Rooms");
+            System.out.println((10 - countFill2d(classesTimeTable[index(C, totalClasses)])) + " Lectures Of " + C + " are Skipped Due To Unavailability of Rooms");
         }
     }
 
