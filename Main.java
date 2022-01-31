@@ -18,6 +18,7 @@ public class Main {
         ArrayList<Integer> roomCapacity = new ArrayList<>();
         ArrayList<Integer> classCapacity = new ArrayList<>();
         ArrayList<String> classCheck = new ArrayList<>();
+        //  classCheck ArrayList is created for the purpose of tracking which classes are unable to take all their lectures.
         String[] totalClasses = {"1A", "1B", "1C", "2A", "2B", "2C"};
         String[] semester1Classes = {"1A", "1B", "1C"};
         String[] semester2Classes = {"2A", "2B", "2C"};
@@ -64,34 +65,40 @@ public class Main {
         String[][][] roomTimeTable = new String[room.size()][5][5];
 
         for (int teacher = 0; teacher < teachersTimeTable.length; teacher++) {
+            day:
             for (int day = 0; day < 5; day++) {
+                period:
                 for (int period = 0; period < 5; period++) {
-                    if (countNull(teachersTimeTable[teacher][day]) > 3) {
-                        // ^ It Checks Teachers Day Lectures (Maximum 2 per Day)
-                        String[] classes = null;
-                        if (searchList(teachersNames[teacher], semester1Teachers)) classes = semester1Classes;
-                        else if (searchList(teachersNames[teacher], semester2Teachers)) classes = semester2Classes;
-                        for (String i : classes != null ? classes : new String[0]) {
-                            if (classTimeTable[index(i, totalClasses)][day][period] == null) {
-                                // ^ It Checks that the Class at the Particular Time Slot is Free
-                                for (String R : room) {
-                                    if (roomTimeTable[room.indexOf(R)][day][period] == null) {
-                                        // ^ It Checks that the Room at the Particular Time Slot is Empty
-                                        if (roomCapacity.get(room.indexOf(R)) >= classCapacity.get(index(i, totalClasses))) {
-                                            if (teachersTimeTable[teacher][day][period] == null) {
-                                                // ^ It Checks that the Teacher at the Particular Time Slot is Free
-                                                if (count1d(i, teachersTimeTable[teacher][day]) == 0) {
-                                                    // ^ It Checks that the Teacher will take maximum 1 lecture in a Particular Class per Day
-                                                    if (count2d(i, teachersTimeTable[teacher]) < 2) {
-                                                        // ^ It Checks that the Teacher will take maximum 2 lecture in a Particular Class per Week
-                                                        if (countNull(classTimeTable[index(i, totalClasses)][day]) > 2) {
-                                                            // ^ It Checks that the Class will take maximum 3 lecture in a Day
-                                                            roomTimeTable[room.indexOf(R)][day][period] = i;
-                                                            teachersTimeTable[teacher][day][period] = i;
-                                                            classTimeTable[index(i, totalClasses)][day][period] = teachersCourses[teacher];
-                                                            if (countFill2d(classTimeTable[index(i, totalClasses)]) == 10)
-                                                                classCheck.remove(i);
+                    if (teachersTimeTable[teacher][day][period] == null) {
+                        // ^ It Checks that the Teacher at the Particular Time Slot is Free
+                        if (countNull(teachersTimeTable[teacher][day]) > 3) {
+                            // ^ It Checks Teachers Day Lectures (Maximum 2 per Day)
+                            String[] classes = null;
+                            if (searchList(teachersNames[teacher], semester1Teachers)) classes = semester1Classes;
+                            else if (searchList(teachersNames[teacher], semester2Teachers)) classes = semester2Classes;
+                            // ^ Above conditions selects the specific classes related to teacher
+                            for (String C : classes != null ? classes : new String[0]) {
+                                if (classTimeTable[index(C, totalClasses)][day][period] == null) {
+                                    // ^ It Checks that the Class at the Particular Time Slot is Free
+                                    if (countNull(classTimeTable[index(C, totalClasses)][day]) > 2) {
+                                        // ^ It Checks that the Class will take maximum 3 lecture in a Day
+                                        if (count1d(C, teachersTimeTable[teacher][day]) == 0) {
+                                            // ^ It Checks that the Teacher will take maximum 1 lecture in a Particular Class per Day
+                                            if (count2d(C, teachersTimeTable[teacher]) < 2) {
+                                                // ^ It Checks that the Teacher will take maximum 2 lecture in a Particular Class per Week
+                                                for (String R : room) {
+                                                    if (roomTimeTable[room.indexOf(R)][day][period] == null) {
+                                                        // ^ It Checks that the Room at the Particular Time Slot is Empty
+                                                        if (roomCapacity.get(room.indexOf(R)) >= classCapacity.get(index(C, totalClasses))) {
+                                                            roomTimeTable[room.indexOf(R)][day][period] = C;
+                                                            teachersTimeTable[teacher][day][period] = C;
+                                                            classTimeTable[index(C, totalClasses)][day][period] = teachersCourses[teacher];
+
+                                                            if (countFill2d(classTimeTable[index(C, totalClasses)]) == 10)
+                                                                classCheck.remove(C);
                                                             // ^ It Checks the Classes that took all their Lectures
+
+                                                            continue period;
                                                         }
                                                     }
                                                 }
@@ -100,8 +107,11 @@ public class Main {
                                     }
                                 }
                             }
+                        } else {
+                            continue day;
                         }
                     }
+
                 }
             }
         }
